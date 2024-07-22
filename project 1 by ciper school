@@ -1,0 +1,118 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int key;
+    struct Node *left, *right;
+};
+
+struct Node* newNode(int key) {
+    Node* root = new Node;
+    root->key = key;
+    root->right = NULL;
+    root->left = NULL;
+    return root;
+}
+
+// Take root node and key value and insert node with value as key.
+// Return the modified tree (or root node)
+struct Node* insert(Node* root, int insertVal) {
+    if (root == NULL) {
+        return newNode(insertVal);
+    }
+    if (root->key > insertVal) {
+        root->left = insert(root->left, insertVal);
+    } else if (root->key < insertVal) {
+        root->right = insert(root->right, insertVal);
+    }
+    return root;
+}
+
+struct Node* deleteNode(Node* root, int deleteVal) {
+    if (root == NULL) {
+        return NULL;
+    }
+    if (root->key > deleteVal) {
+        root->left = deleteNode(root->left, deleteVal);
+    } else if (root->key < deleteVal) {
+        root->right = deleteNode(root->right, deleteVal);
+    } else {
+        if (root->left == NULL) {
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        } else if (root->right == NULL) {
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        Node* temp = root->right;
+        while (temp && temp->left != NULL) {
+            temp = temp->left;
+        }
+
+        root->key = temp->key;
+        root->right = deleteNode(root->right, temp->key);
+    }
+    return root;
+}
+
+bool search(Node* root, int searchVal) {
+    if (root == NULL) {
+        return false;
+    }
+    if (root->key == searchVal) {
+        return true;
+    } else if (root->key > searchVal) {
+        return search(root->left, searchVal);
+    } else {
+        return search(root->right, searchVal);
+    }
+}
+
+void inorder(Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        cout << root->key << " ";
+        inorder(root->right);
+    }
+}
+
+int main() {
+    int n;
+    cout << "Insert number of elements for sorted: ";
+    cin >> n;
+    cout << "Enter your elements for sorted: ";
+    struct Node* root = NULL;
+
+    for (int i = 0; i < n; i++) {
+        int val;
+        cin >> val;
+        root = insert(root, val);
+    }
+
+    cout << "Sorted elements: ";
+    inorder(root);
+    cout << endl;
+
+    int z;
+    cout << "Search for first element: ";
+    cin >> z;
+    cout << "Search result for first value: " << search(root, z) << endl;
+
+    int s;
+    cout << "Search for second element: ";
+    cin >> s;
+    cout << "Search result for second value: " << search(root, s) << endl;
+
+    int del;
+    cout << "Enter value to delete: ";
+    cin >> del;
+    root = deleteNode(root, del);
+    cout << "Sorted elements after deletion: ";
+    inorder(root);
+    cout << endl;
+
+    return 0;
+}
